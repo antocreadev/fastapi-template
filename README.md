@@ -1,6 +1,6 @@
 # fastapi-template
 
-# Initialize the project
+## Initialize the project
 1. Create a virtual environment
 ```bash
 python3 -m venv venv
@@ -17,4 +17,4 @@ pip3 install -r requirements.txt
 ```bash
 make run
 ```
-5. Open the browser and go to http://127.0.0.1:8000
+5. Open the browser and go to http://127.0.0.1:8000/docs
