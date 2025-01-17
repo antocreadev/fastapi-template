@@ -1,4 +1,8 @@
 **/__pychache__
 **/.env
 **/venv
+**/.venv
+**/env
+**/.env
+**/.idea
 **/.DS_Store
