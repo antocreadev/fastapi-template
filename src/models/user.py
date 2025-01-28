@@ -1,13 +1,15 @@
 from sqlalchemy import Boolean, Column, Integer, String
+from sqlalchemy_file import FileField, ImageField
 
-from database import Base
+from src.database import Base
 
 
 class User(Base):
     __tablename__ = "User"
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True, nullable=False)
     firstname = Column(String)
     lastname = Column(String)
-    email = Column(String, unique=True, index=True)
-    password = Column(String) 
-    rgpd = Column(Boolean)
+    img = Column(ImageField())
+    email = Column(String, unique=True, index=True, nullable=False)
+    password = Column(String, nullable=False) 
+    rgpd = Column(Boolean, nullable=False)

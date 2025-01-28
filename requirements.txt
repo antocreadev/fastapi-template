@@ -9,3 +9,7 @@ psycopg2-binary
 python-multipart
 python-jose
 bcrypt
+starlette-admin
+sqlalchemy-file
+Pillow
+fasteners

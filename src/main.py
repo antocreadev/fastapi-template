@@ -1,16 +1,27 @@
 from datetime import datetime
+from os import makedirs
 from typing import Annotated
 
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from libcloud.storage.drivers.local import LocalStorageDriver
 from sqlalchemy.orm import Session
+from sqlalchemy_file.storage import StorageManager
+from starlette_admin.contrib.sqla import Admin, ModelView
 
-import services.user as user
-from config import DESCRIPTION, TAGS_METADATA, TITLE
-from database import create_database
-from routes.auth import router as auth_router
-from routes.user import router as user_router
+from src.config import DESCRIPTION, TAGS_METADATA, TITLE
+from src.database import create_database, engine
+from src.models.user import User
+from src.routes.auth import router as auth_router
+from src.routes.user import router as user_router
+from src.schemas.user import UserResponse
+
+# Configure Storage
+makedirs("./src/upload/attachment", 0o777, exist_ok=True)
+container = LocalStorageDriver("./src/upload").get_container("attachment")
+StorageManager.add_storage("default", container)
+
 
 app = FastAPI(
     title=TITLE,
@@ -28,10 +39,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+admin = Admin(engine)
+admin.add_view(ModelView(User))
+admin.mount_to(app)
 
 @app.get("/", tags=["Server"])
 async def root():
-    return {"message": "API is online, welcome to the API documentation at /docs or /redocs"}
+    return {"message": "API T is online, welcome to the API documentation at /docs or /redocs"}
 
 @app.get("/unixTimes", tags=["Server"])
 async def read_item():
@@ -40,6 +54,3 @@ async def read_item():
 
 app.include_router(user_router, prefix="/users", tags=["Users"])
 app.include_router(auth_router, prefix="/auth", tags=["Auth"])
-
-
-

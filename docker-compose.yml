@@ -11,27 +11,42 @@ services:
     ports:
       - ${A}:5432
     volumes:
-      - postgres_data:/var/lib/postgresql/
-    networks:
-      - api-net
+      - .postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   api:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: api
-    # restart: unless-stopped
+    restart: unless-stopped
     env_file:
       - ./.env
+    environment: # surcharge la variable d'environnement car local != prod
+      - POSTGRES_SERVER=db
+      - A=5432
+    volumes:
+      - ./:/code
     ports:
       - 8090:8090
-    networks:
-      - api-net
+    depends_on:
+      db:
+        condition: service_healthy
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: unless-stopped
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "5050:80"
     depends_on:
       - db
-
-networks:
-  api-net:
-
 volumes:
-  postgres_data:
+  .postgres_data:
